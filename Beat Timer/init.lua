@@ -44,7 +44,6 @@ else
   }
 end
 
-
 local function SaveOptions(options)
   local file = io.open(optionsFileName, "w")
   if file ~= nil then
@@ -90,6 +89,7 @@ function getSwatchInternetTime()
   return beats
 end
 
+-- Function to determine if we have Divine Punishment or not
 local function doWeHaveDivinePunishment()
   local currentBeats = getSwatchInternetTime()
   if currentBeats < 100 or math.fmod(currentBeats, 200) == 0 then
