@@ -112,8 +112,12 @@ function getTimeUntilNextHundredthBeat()
   local minutes = math.floor((secondsUntilNextHundredth % 3600) / 60)
   local seconds = math.floor(secondsUntilNextHundredth % 60)
   
+  if hours == 0 then
+    return string.format("%02d:%02d", minutes, seconds)
+  end
+
   -- Return the formatted string
-  return string.format("%02d:%02d:%02d", hours, minutes, seconds)
+  return string.format("%1d:%02d:%02d", hours, minutes, seconds)
 end
 
 local function getFormattedBeatTime()
@@ -216,7 +220,7 @@ local function init()
   
   return {
     name = "Beat Timer",
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Nate Nasteff",
     description = "Displays a timer for the next .beat event",
     present = present

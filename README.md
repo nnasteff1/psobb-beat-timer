@@ -27,3 +27,12 @@ Many thanks to Seth Clydesdale - I used his [**Coordinate Viewer**](https://gith
 
 Additional thanks to Soly for his work in creating/maintaining the 
 [**PSOBB Addon Plugin**](https://github.com/HybridEidolon/psobbaddonplugin) library.
+
+# Changelog
+
+v1.0.0 
+- Initial addon version
+
+v1.0.1 
+- Updated timer to only show single hour digits (1:00:00 vs 01:00:00)
+- Updated timer to truncate if no hours remain in the timer (1:00:00 -> 59:59)
