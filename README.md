@@ -1,19 +1,20 @@
 # psobb-beat-timer
 A simple timer to display the time remaining for/until a .beat event in PSOBB.
 
-# Purpose
-This plugin displays:
+# What's the point of this?
+I got sick of using other methods of figuring out how long until I could use Divine Punishment (or how much longer it was still available), so I wrote a simple plugin that displays the following:
 - The current .beat time (synchronized with the system clock)
 - The amount of time until the next .beat event
 
+# What's a .beat event?
 #### .beat events can be described as follows:
 
-- If the hundreth value of the current .beat time is even, Divine Punishment is available. The countdown timer will represent the amount of time remaining until Divine Punishment is unavailable.
+- If the hundreds place of the current .beat time is even (EG 678), Divine Punishment is available. The countdown timer will represent the amount of time remaining until Divine Punishment is unavailable (in green).
 
-- If the hundreth value of the current .beat time is odd, Divine Punishment is unavailable. The countdown timer will represent the amount of time remaining until Divine Punishment is available.
+- If the hundreds place of the current .beat time is odd (EG 152), Divine Punishment is unavailable. The countdown timer will represent the amount of time remaining until Divine Punishment is available (in red).
 
 # Preview
-need some images
+![beat-timer-preview](https://github.com/user-attachments/assets/de2a3b82-f4d8-4220-bb7e-7e6dd89cfe3e)
 
 # Installation
 1. Install the [**addon plugin**](https://github.com/HybridEidolon/psobbaddonplugin) for PSOBB.
