@@ -1,6 +1,6 @@
 local function ConfigurationWindow(configuration, customTheme)
   local this = {
-    title = "Divine Punishment Timer - Configuration",
+    title = "Beat Timer - Configuration",
     fontScale = 1.0,
     open = false,
     changed = false,
