@@ -1,11 +1,11 @@
 -- imports
 local core_mainmenu = require("core_mainmenu")
-local cfg = require("Divine Punishment Timer.configuration")
+local cfg = require("Beat Timer.configuration")
 local lib_theme_loaded, lib_theme = pcall(require, "Theme Editor.theme")
 
 -- options
-local optionsLoaded, options = pcall(require, "Divine Punishment Timer.options")
-local optionsFileName = "addons/Divine Punishment Timer/options.lua"
+local optionsLoaded, options = pcall(require, "Beat Timer.options")
+local optionsFileName = "addons/Beat Timer/options.lua"
 local firstPresent = true
 local ConfigurationWindow
 
@@ -34,11 +34,11 @@ else
     NoTitleBar = "",
     NoResize = "",
     Transparent = false,
-    fontScale = 1.0,
-    X = 100,
-    Y = 100,
-    Width = 150,
-    Height = 80,
+    fontScale = 1.15,
+    X = 400,
+    Y = 500,
+    Width = 170,
+    Height = 92,
     Changed = false,
     NoHighContrast = false,
   }
@@ -116,10 +116,14 @@ function getTimeUntilNextHundredthBeat()
   return string.format("%02d:%02d:%02d", hours, minutes, seconds)
 end
 
+local function getFormattedBeatTime()
+  return string.format("@%.2f", getSwatchInternetTime())
+end
+
 -- Shows the timer
 local function showTimer()
     local timeTilNextEvent = getTimeUntilNextHundredthBeat()
-    local currentBeats = string.format("@%.2f", getSwatchInternetTime())
+    local currentBeats = getFormattedBeatTime()
 
     if doWeHaveDivinePunishment() then
       if options.NoHighContrast then
@@ -139,15 +143,6 @@ local function showTimer()
       end
     end
     
-end
-
--- Function to perform the countdown
-function countdownToNextHundredthBeat()
-  while true do
-      showTimer()
-      -- Wait for 1 second before updating the countdown
-      os.execute("sleep 1")
-  end
 end
 
 -- config setup and drawing
@@ -184,8 +179,10 @@ local function present()
       imgui.SetNextWindowSize(options.Width, options.Height, "Always");
     end
     
-    if imgui.Begin("Divine Punishment Timer", nil, { options.NoTitleBar, options.NoResize }) then
+    if imgui.Begin("Beat Timer", nil, { options.NoTitleBar, options.NoResize }) then
       imgui.SetWindowFontScale(options.fontScale)
+
+      -- Print the beat timer
       showTimer();
     end
     imgui.End()
@@ -204,7 +201,6 @@ local function present()
   end
 end
 
-
 local function init()
   ConfigurationWindow = cfg.ConfigurationWindow(options, lib_theme_loaded)
 
@@ -212,17 +208,17 @@ local function init()
     ConfigurationWindow.open = not ConfigurationWindow.open
   end
 
-  core_mainmenu.add_button("Divine Punishment Timer", mainMenuButtonHandler)
+  core_mainmenu.add_button("Beat Timer", mainMenuButtonHandler)
   
   if lib_theme_loaded == false then
-    print("Divine Punishment Timer : lib_theme couldn't be loaded")
+    print("Beat Timer : lib_theme couldn't be loaded")
   end
   
   return {
-    name = "Divine Punishment Timer",
+    name = "Beat Timer",
     version = "1.0.0",
     author = "Nate Nasteff",
-    description = "Displays a timer for the next Divine Punishment event",
+    description = "Displays a timer for the next .beat event",
     present = present
   }
 end
