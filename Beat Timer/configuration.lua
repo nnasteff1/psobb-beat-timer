@@ -181,13 +181,13 @@ end
 
     if imgui.TreeNodeEx("Display", "DefaultClosed") then
       if _configuration.BeatTimeColor then
-        _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFFF6900, _configuration.BeatTimeColor)
+        _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFFFCE2F, _configuration.BeatTimeColor)
       end
       if _configuration.HeavenPunisherColor then
-        _configuration.HeavenPunisherColor = PresentColorEditor("HP active color", 0xFFFF6900, _configuration.HeavenPunisherColor)
+        _configuration.HeavenPunisherColor = PresentColorEditor("HP active color", 0xFF43FF00, _configuration.HeavenPunisherColor)
       end
       if _configuration.NoHeavenPunisherColor then
-        _configuration.NoHeavenPunisherColor = PresentColorEditor("HP inactive color", 0xFFFF6900, _configuration.NoHeavenPunisherColor)
+        _configuration.NoHeavenPunisherColor = PresentColorEditor("HP inactive color", 0xFFED3228, _configuration.NoHeavenPunisherColor)
       end
     end
   end
