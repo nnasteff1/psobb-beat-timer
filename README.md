@@ -14,7 +14,8 @@ I got sick of using other methods of figuring out how long until I could use Div
 - If the hundreds place of the current .beat time is odd (EG 152), Divine Punishment is unavailable. The countdown timer will represent the amount of time remaining until Divine Punishment is available (in red).
 
 # Preview
-![beat-timer-preview](https://github.com/user-attachments/assets/de2a3b82-f4d8-4220-bb7e-7e6dd89cfe3e)
+![beat-timer-prieview-v 0 2](https://github.com/user-attachments/assets/7ede7a32-1fbb-4d9c-bfa6-eb9a5f9df9e6)
+
 
 # Installation
 1. Install the [**addon plugin**](https://github.com/HybridEidolon/psobbaddonplugin) for PSOBB.
