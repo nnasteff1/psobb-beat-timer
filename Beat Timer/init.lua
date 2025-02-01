@@ -253,7 +253,7 @@ local function init()
   
   return {
     name = "Beat Timer",
-    version = "1.0.1",
+    version = "1.0.2",
     author = "Nate Nasteff",
     description = "Displays a timer for the next .beat event",
     present = present

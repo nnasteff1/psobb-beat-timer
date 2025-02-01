@@ -21,6 +21,7 @@ I got sick of using other methods of figuring out how long until I could use Div
 2. Download this repository by clicking [**here**](https://github.com/nnasteff1/psobb-beat-timer/archive/main.zip).
 3. Copy the "Beat Timer" directory into the /addons directory in your PSOBB directory.
 
+
 # Credits
 
 Many thanks to Seth Clydesdale - I used his [**Coordinate Viewer**](https://github.com/SethClydesdale/psobb-coordinate-viewer/) plugin as a template for this plugin.
@@ -36,3 +37,8 @@ v1.0.0
 v1.0.1 
 - Updated timer to only show single hour digits (1:00:00 vs 01:00:00)
 - Updated timer to truncate if no hours remain in the timer (1:00:00 -> 59:59)
+
+v1.0.2
+- Allowed for custom colors for .beat clock and timer
+- Added ability to hide the .beat clock
+- Swapped the .beat clock and timer locations in the display
