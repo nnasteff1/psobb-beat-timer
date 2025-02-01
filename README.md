@@ -15,6 +15,9 @@ I got sick of using other methods of figuring out how long until I could use Div
 
 # Preview
 ![beat-timer-prieview-v 0 2](https://github.com/user-attachments/assets/7ede7a32-1fbb-4d9c-bfa6-eb9a5f9df9e6)
+<br>
+<br>
+![beat-timer-active](https://github.com/user-attachments/assets/c86b80b0-6543-48ef-a219-38e4334e301d)
 
 
 # Installation
@@ -40,6 +43,7 @@ v1.0.1
 - Updated timer to truncate if no hours remain in the timer (1:00:00 -> 59:59)
 
 v1.0.2
+- Fixed a bug related to wrong color being displayed due to improper check for .beat event
 - Added 10-minute warning colorization to timer
 - Expanded menu + option to disable all colors
 - Allowed for custom colors for .beat clock, timer and 10 minute warning
