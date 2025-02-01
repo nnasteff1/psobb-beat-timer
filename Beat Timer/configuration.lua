@@ -33,7 +33,7 @@ local function ConfigurationWindow(configuration, customTheme)
     imgui.BeginGroup()
     imgui.PushID(label)
 
-    imgui.PushItemWidth(50)
+    imgui.PushItemWidth(75)
     for n = 1, 4, 1 do
         local changedDragInt = false
         if n ~= 1 then
@@ -177,17 +177,23 @@ end
         _configuration.NoHighContrast = not _configuration.NoHighContrast
         this.changed = true
       end
+      imgui.TreePop()
     end
 
     if imgui.TreeNodeEx("Display", "DefaultClosed") then
-      if _configuration.BeatTimeColor then
-        _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFFFCE2F, _configuration.BeatTimeColor)
+      if imgui.Checkbox("Show .beat clock", _configuration.ShowBeatClock) then
+        _configuration.ShowBeatClock = not _configuration.ShowBeatClock
+        this.changed = true
       end
+      imgui.Text("")
       if _configuration.HeavenPunisherColor then
         _configuration.HeavenPunisherColor = PresentColorEditor("HP active color", 0xFF43FF00, _configuration.HeavenPunisherColor)
       end
       if _configuration.NoHeavenPunisherColor then
         _configuration.NoHeavenPunisherColor = PresentColorEditor("HP inactive color", 0xFFED3228, _configuration.NoHeavenPunisherColor)
+      end
+      if _configuration.BeatTimeColor and _configuration.ShowBeatClock then
+        _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFF0DC07, _configuration.BeatTimeColor)
       end
     end
   end

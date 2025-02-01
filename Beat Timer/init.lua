@@ -9,21 +9,6 @@ local optionsFileName = "addons/Beat Timer/options.lua"
 local firstPresent = true
 local ConfigurationWindow
 
-local function shiftHexColor(color)
-  return
-  {
-    bit.band(bit.rshift(color, 16), 0xFF)/255,
-    bit.band(bit.rshift(color, 8), 0xFF)/255,
-    bit.band(color, 0xFF)/255,
-    bit.band(bit.rshift(color, 24), 0xFF)/255
-  }
-end
-
-local function TextCustomColored(color, text)
-  if not color then return imgui.Text(text) end
-  return imgui.TextColored(color[1], color[2], color[3], color[4], text)
-end
-
 if optionsLoaded then
   options.configurationEnableWindow = options.configurationEnableWindow == nil and true or options.configurationEnableWindow
   options.enable = options.enable == nil and true or options.enable
@@ -39,9 +24,10 @@ if optionsLoaded then
   options.Height = options.Height or 80
   options.Changed = options.Changed or false
   options.NoHighContrast = options.HighContrast == nil and false or options.HighContrast
-  options.BeatTimeColor = options.BeatTimeColor or -12753
+  options.ShowBeatClock = options.ShowBeatClock == nil and true or options.ShowBeatClock
+  options.BeatTimeColor = options.BeatTimeColor or -992249
   options.HeavenPunisherColor = options.HeavenPunisherColor or -12321024
-  options.NoHeavenPunisherColor = options.HeavenPunisherColor or -1232344
+  options.NoHeavenPunisherColor = options.NoHeavenPunisherColor or -1232344
 else
   options = {
     configurationEnableWindow = true,
@@ -58,7 +44,8 @@ else
     Height = 92,
     Changed = false,
     NoHighContrast = false,
-    BeatTimeColor = -12753,
+    ShowBeatClock = true,
+    BeatTimeColor = -992249,
     HeavenPunisherColor = -12321024,
     NoHeavenPunisherColor = -1232344
   }
@@ -94,8 +81,22 @@ local function SaveOptions(options)
   end
 end
 
+-- Custom colored text with hex shifted to ARGB
+local function TextCustomColored(color, text)
+  if not color then return imgui.Text(text) end
+  color =  
+  {
+    bit.band(bit.rshift(color, 16), 0xFF)/255,
+    bit.band(bit.rshift(color, 8), 0xFF)/255,
+    bit.band(color, 0xFF)/255,
+    bit.band(bit.rshift(color, 24), 0xFF)/255
+  }
+  return imgui.TextColored(color[1], color[2], color[3], color[4], text)
+end
+
+
 -- Function to get the current Swatch Internet Time
-function getSwatchInternetTime()
+local function getSwatchInternetTime()
   -- Get the current time in UTC
   local utcTime = os.time(os.date("*t"))
   
@@ -122,7 +123,7 @@ local function doWeHaveDivinePunishment()
 end
 
 -- Function to calculate the time until the next hundredth beat time
-function getTimeUntilNextHundredthBeat()
+local function getTimeUntilNextHundredthBeat()
   local currentBeats = getSwatchInternetTime()
   local nextHundredthBeat = math.ceil(currentBeats / 100) * 100
   local beatsUntilNextHundredth = nextHundredthBeat - currentBeats
@@ -144,37 +145,41 @@ function getTimeUntilNextHundredthBeat()
 end
 
 local function getFormattedBeatTime()
-  return string.format("@%.2f", getSwatchInternetTime())
+  beats = getSwatchInternetTime()
+  if beats < 100 then
+    return string.format("@ 0%.2f", beats)
+  end
+  return string.format("@ %.2f", getSwatchInternetTime())
 end
 
 -- Shows the timer
 local function showTimer()
     local timeTilNextEvent = getTimeUntilNextHundredthBeat()
     local currentBeats = getFormattedBeatTime()
-    local customColor = shiftHexColor(options.BeatTimeColor)
-    local customColor2 = shiftHexColor(options.HeavenPunisherColor)
-    local customColor3 = shiftHexColor(options.NoHeavenPunisherColor)
 
-    if options.NoHighContrast then
-      imgui.Text(currentBeats)
-    else
-      TextCustomColored(shiftHexColor(options.BeatTimeColor), currentBeats)
-    end
-
+    -- Display the time until the next .beat event
     if doWeHaveDivinePunishment() then
       if options.NoHighContrast then
         imgui.Text(timeTilNextEvent)
         return
       end
-      TextCustomColored(shiftHexColor(options.HeavenPunisherColor), timeTilNextEvent)
+      TextCustomColored(options.HeavenPunisherColor, timeTilNextEvent)
     else
       if options.NoHighContrast then
         imgui.Text(timeTilNextEvent)
         return
       end
-      TextCustomColored(shiftHexColor(options.HeavenPunisherColor), timeTilNextEvent)
+      TextCustomColored(options.NoHeavenPunisherColor, timeTilNextEvent)
     end
-    
+
+    -- Display the beat time if it's enabled
+    if options.ShowBeatClock then
+      if options.NoHighContrast then
+        imgui.Text(currentBeats)
+      else
+        TextCustomColored(options.BeatTimeColor, currentBeats)
+      end
+    end
 end
 
 -- config setup and drawing
