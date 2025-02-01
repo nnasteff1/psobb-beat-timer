@@ -119,17 +119,12 @@ end
 -- Function to determine if we have Divine Punishment or not
 local function doWeHaveDivinePunishment()
   local currentBeats = getSwatchInternetTime()
-  if currentBeats < 100 or math.fmod(currentBeats, 200) == 0 then
+  local hundredsDigit = math.floor(currentBeats / 100)
+  if currentBeats < 100 or math.fmod(hundredsDigit, 2) == 0 then
     return true
   end
   return false
 end
-
-local time = { 
-  hours = nil,
-  minutes = nil,
-  seconds = nil
-}
 
 -- Function to calculate the time until the next hundredth beat time
 local function getTimeUntilNextHundredthBeat()
@@ -140,6 +135,12 @@ local function getTimeUntilNextHundredthBeat()
   -- Convert beats to seconds (1 beat = 86.4 seconds)
   local secondsUntilNextHundredth = beatsUntilNextHundredth * 86.4
   
+  local time = { 
+    hours = nil,
+    minutes = nil,
+    seconds = nil
+  }
+
   -- Calculate hours, minutes, and seconds
   time.hours = math.floor(secondsUntilNextHundredth / 3600)
   time.minutes = math.floor((secondsUntilNextHundredth % 3600) / 60)
@@ -157,14 +158,6 @@ local function getFormattedTimeForTimer(time)
   return string.format("%1d:%02d:%02d", time.hours, time.minutes, time.seconds)
 end
 
-local function isItWarningTime(time)
-  if time.hours == 0 and time.minutes < 10 then
-    return true
-  end
-  return false
-end
-
-
 local function getFormattedBeatTime()
   beats = getSwatchInternetTime()
   if beats < 100 then
@@ -173,33 +166,29 @@ local function getFormattedBeatTime()
   return string.format("@ %.2f", getSwatchInternetTime())
 end
 
+local function getTimerColor(time)
+  if time.hours == 0 and time.minutes < 10 then
+    return options.WarningColor
+  end
+  if doWeHaveDivinePunishment() then
+    return options.HeavenPunisherColor
+  end
+
+  return options.NoHeavenPunisherColor
+end
+
 -- Shows the timer
 local function showTimer()
-    local timeTilNextEvent = getTimeUntilNextHundredthBeat()
-    local formattedTimer = getFormattedTimeForTimer(timeTilNextEvent)
+    local timeTable = getTimeUntilNextHundredthBeat()
+    local formattedTimer = getFormattedTimeForTimer(timeTable)
     local currentBeats = getFormattedBeatTime()
+    local timerColor = getTimerColor(timeTable)
 
     -- Display the time until the next .beat event
-    if doWeHaveDivinePunishment() then
-      if options.ColorEnabled then
-        if isItWarningTime(timeTilNextEvent) then
-          TextCustomColored(options.WarningColor, formattedTimer)
-        else
-          TextCustomColored(options.HeavenPunisherColor, formattedTimer)
-        end
-      else
-        imgui.Text(formattedTimer)
-      end
+    if options.ColorEnabled then
+      TextCustomColored(timerColor, formattedTimer)
     else
-      if options.ColorEnabled then
-        if isItWarningTime(timeTilNextEvent) then
-          TextCustomColored(options.WarningColor, formattedTimer)
-        else
-          TextCustomColored(options.NoHeavenPunisherColor, formattedTimer)
-        end
-      else
-        imgui.Text(formattedTimer)
-      end
+      imgui.Text(formattedTimer)
     end
 
     -- Display the beat time if it's enabled

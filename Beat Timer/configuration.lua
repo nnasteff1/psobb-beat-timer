@@ -194,7 +194,7 @@ end
           _configuration.WarningColor = PresentColorEditor("10 minute warning color", 0xFFF0DC07, _configuration.WarningColor)
         end
         if _configuration.BeatTimeColor and _configuration.ShowBeatClock then
-          _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFFFFFFF, _configuration.BeatTimeColor)
+          _configuration.BeatTimeColor = PresentColorEditor(".beat clock color", 0xFFFFFFFF, _configuration.BeatTimeColor)
         end
       end
     end
