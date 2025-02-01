@@ -137,7 +137,7 @@ end
       
       
       imgui.Text("\nPosition and Size")
-      imgui.PushItemWidth(100)
+      imgui.PushItemWidth(150)
       success, _configuration.X = imgui.InputInt("X", _configuration.X)
       imgui.PopItemWidth()
       if success then
@@ -146,7 +146,7 @@ end
       end
       
       imgui.SameLine(0, 38)
-      imgui.PushItemWidth(100)
+      imgui.PushItemWidth(150)
       success, _configuration.Y = imgui.InputInt("Y", _configuration.Y)
       imgui.PopItemWidth()
       if success then
@@ -154,7 +154,7 @@ end
         this.changed = true
       end
       
-      imgui.PushItemWidth(100)
+      imgui.PushItemWidth(150)
       success, _configuration.Width = imgui.InputInt("Width", _configuration.Width)
       imgui.PopItemWidth()
       if success then
@@ -163,20 +163,14 @@ end
       end
       
       imgui.SameLine(0, 10)
-      imgui.PushItemWidth(100)
+      imgui.PushItemWidth(150)
       success, _configuration.Height = imgui.InputInt("Height", _configuration.Height)
       imgui.PopItemWidth()
       if success then
         _configuration.Changed = true
         this.changed = true
       end
-      
-      
-      imgui.Text("\nOptions")
-      if imgui.Checkbox("Disable High Contrast Color", _configuration.NoHighContrast) then
-        _configuration.NoHighContrast = not _configuration.NoHighContrast
-        this.changed = true
-      end
+
       imgui.TreePop()
     end
 
@@ -185,15 +179,23 @@ end
         _configuration.ShowBeatClock = not _configuration.ShowBeatClock
         this.changed = true
       end
-      imgui.Text("")
-      if _configuration.HeavenPunisherColor then
-        _configuration.HeavenPunisherColor = PresentColorEditor("HP active color", 0xFF43FF00, _configuration.HeavenPunisherColor)
+      if imgui.Checkbox("Color Enabled", _configuration.ColorEnabled) then
+        _configuration.ColorEnabled = not _configuration.ColorEnabled
+        this.changed = true
       end
-      if _configuration.NoHeavenPunisherColor then
-        _configuration.NoHeavenPunisherColor = PresentColorEditor("HP inactive color", 0xFFED3228, _configuration.NoHeavenPunisherColor)
-      end
-      if _configuration.BeatTimeColor and _configuration.ShowBeatClock then
-        _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFF0DC07, _configuration.BeatTimeColor)
+      if _configuration.ColorEnabled then
+        if _configuration.HeavenPunisherColor then
+          _configuration.HeavenPunisherColor = PresentColorEditor("HP active color", 0xFF00FF00, _configuration.HeavenPunisherColor)
+        end
+        if _configuration.NoHeavenPunisherColor then
+          _configuration.NoHeavenPunisherColor = PresentColorEditor("HP inactive color", 0xFFFF0000, _configuration.NoHeavenPunisherColor)
+        end
+        if _configuration.WarningColor then
+          _configuration.WarningColor = PresentColorEditor("10 minute warning color", 0xFFF0DC07, _configuration.WarningColor)
+        end
+        if _configuration.BeatTimeColor and _configuration.ShowBeatClock then
+          _configuration.BeatTimeColor = PresentColorEditor(".beat time color", 0xFFFFFFFF, _configuration.BeatTimeColor)
+        end
       end
     end
   end

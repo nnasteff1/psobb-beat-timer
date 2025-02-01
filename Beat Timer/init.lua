@@ -23,11 +23,12 @@ if optionsLoaded then
   options.Width = options.Width or 150
   options.Height = options.Height or 80
   options.Changed = options.Changed or false
-  options.NoHighContrast = options.HighContrast == nil and false or options.HighContrast
+  options.ColorEnabled = options.ColorEnabled == nil and true or options.ColorEnabled
   options.ShowBeatClock = options.ShowBeatClock == nil and true or options.ShowBeatClock
-  options.BeatTimeColor = options.BeatTimeColor or -992249
-  options.HeavenPunisherColor = options.HeavenPunisherColor or -12321024
-  options.NoHeavenPunisherColor = options.NoHeavenPunisherColor or -1232344
+  options.BeatTimeColor = options.BeatTimeColor or -1
+  options.HeavenPunisherColor = options.HeavenPunisherColor or -16711936
+  options.NoHeavenPunisherColor = options.NoHeavenPunisherColor or -65536
+  options.WarningColor = options.WarningColor or -992249
 else
   options = {
     configurationEnableWindow = true,
@@ -43,11 +44,12 @@ else
     Width = 170,
     Height = 92,
     Changed = false,
-    NoHighContrast = false,
+    ColorEnabled = true,
     ShowBeatClock = true,
-    BeatTimeColor = -992249,
-    HeavenPunisherColor = -12321024,
-    NoHeavenPunisherColor = -1232344
+    BeatTimeColor = -1,
+    HeavenPunisherColor = -16711936,
+    NoHeavenPunisherColor = -65536,
+    WarningColor = -992249,
   }
 end
 
@@ -71,10 +73,11 @@ local function SaveOptions(options)
     io.write(string.format("  Width = %s,\n", tostring(options.Width)))
     io.write(string.format("  Height = %s,\n", tostring(options.Height)))
     io.write(string.format("  Changed = %s,\n", tostring(options.Changed)))
-    io.write(string.format("  NoHighContrast = %s,\n", tostring(options.NoHighContrast)))
+    io.write(string.format("  ColorEnabled = %s,\n", tostring(options.ColorEnabled)))
     io.write(string.format("  BeatTimeColor = %s,\n", tostring(options.BeatTimeColor)))
     io.write(string.format("  HeavenPunisherColor = %s,\n", tostring(options.HeavenPunisherColor)))
     io.write(string.format("  NoHeavenPunisherColor = %s,\n", tostring(options.NoHeavenPunisherColor)))
+    io.write(string.format("  WarningColor = %s,\n", tostring(options.WarningColor)))
     io.write("}\n")
 
     io.close(file)
@@ -122,6 +125,12 @@ local function doWeHaveDivinePunishment()
   return false
 end
 
+local time = { 
+  hours = nil,
+  minutes = nil,
+  seconds = nil
+}
+
 -- Function to calculate the time until the next hundredth beat time
 local function getTimeUntilNextHundredthBeat()
   local currentBeats = getSwatchInternetTime()
@@ -132,17 +141,29 @@ local function getTimeUntilNextHundredthBeat()
   local secondsUntilNextHundredth = beatsUntilNextHundredth * 86.4
   
   -- Calculate hours, minutes, and seconds
-  local hours = math.floor(secondsUntilNextHundredth / 3600)
-  local minutes = math.floor((secondsUntilNextHundredth % 3600) / 60)
-  local seconds = math.floor(secondsUntilNextHundredth % 60)
-  
-  if hours == 0 then
-    return string.format("%02d:%02d", minutes, seconds)
+  time.hours = math.floor(secondsUntilNextHundredth / 3600)
+  time.minutes = math.floor((secondsUntilNextHundredth % 3600) / 60)
+  time.seconds = math.floor(secondsUntilNextHundredth % 60)
+
+  return time
+end
+
+local function getFormattedTimeForTimer(time)
+  if time.hours == 0 then
+    return string.format("%02d:%02d", time.minutes, time.seconds)
   end
 
   -- Return the formatted string
-  return string.format("%1d:%02d:%02d", hours, minutes, seconds)
+  return string.format("%1d:%02d:%02d", time.hours, time.minutes, time.seconds)
 end
+
+local function isItWarningTime(time)
+  if time.hours == 0 and time.minutes < 10 then
+    return true
+  end
+  return false
+end
+
 
 local function getFormattedBeatTime()
   beats = getSwatchInternetTime()
@@ -155,29 +176,38 @@ end
 -- Shows the timer
 local function showTimer()
     local timeTilNextEvent = getTimeUntilNextHundredthBeat()
+    local formattedTimer = getFormattedTimeForTimer(timeTilNextEvent)
     local currentBeats = getFormattedBeatTime()
 
     -- Display the time until the next .beat event
     if doWeHaveDivinePunishment() then
-      if options.NoHighContrast then
-        imgui.Text(timeTilNextEvent)
-        return
+      if options.ColorEnabled then
+        if isItWarningTime(timeTilNextEvent) then
+          TextCustomColored(options.WarningColor, formattedTimer)
+        else
+          TextCustomColored(options.HeavenPunisherColor, formattedTimer)
+        end
+      else
+        imgui.Text(formattedTimer)
       end
-      TextCustomColored(options.HeavenPunisherColor, timeTilNextEvent)
     else
-      if options.NoHighContrast then
-        imgui.Text(timeTilNextEvent)
-        return
+      if options.ColorEnabled then
+        if isItWarningTime(timeTilNextEvent) then
+          TextCustomColored(options.WarningColor, formattedTimer)
+        else
+          TextCustomColored(options.NoHeavenPunisherColor, formattedTimer)
+        end
+      else
+        imgui.Text(formattedTimer)
       end
-      TextCustomColored(options.NoHeavenPunisherColor, timeTilNextEvent)
     end
 
     -- Display the beat time if it's enabled
     if options.ShowBeatClock then
-      if options.NoHighContrast then
-        imgui.Text(currentBeats)
-      else
+      if options.ColorEnabled then
         TextCustomColored(options.BeatTimeColor, currentBeats)
+      else
+        imgui.Text(currentBeats)
       end
     end
 end
