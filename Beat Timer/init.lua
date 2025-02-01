@@ -9,7 +9,6 @@ local optionsFileName = "addons/Beat Timer/options.lua"
 local firstPresent = true
 local ConfigurationWindow
 
-
 if optionsLoaded then
   options.configurationEnableWindow = options.configurationEnableWindow == nil and true or options.configurationEnableWindow
   options.enable = options.enable == nil and true or options.enable
@@ -24,7 +23,12 @@ if optionsLoaded then
   options.Width = options.Width or 150
   options.Height = options.Height or 80
   options.Changed = options.Changed or false
-  options.NoHighContrast = options.HighContrast == nil and false or options.HighContrast
+  options.ColorEnabled = options.ColorEnabled == nil and true or options.ColorEnabled
+  options.ShowBeatClock = options.ShowBeatClock == nil and true or options.ShowBeatClock
+  options.BeatTimeColor = options.BeatTimeColor or -1
+  options.HeavenPunisherColor = options.HeavenPunisherColor or -16711936
+  options.NoHeavenPunisherColor = options.NoHeavenPunisherColor or -65536
+  options.WarningColor = options.WarningColor or -992249
 else
   options = {
     configurationEnableWindow = true,
@@ -40,7 +44,12 @@ else
     Width = 170,
     Height = 92,
     Changed = false,
-    NoHighContrast = false,
+    ColorEnabled = true,
+    ShowBeatClock = true,
+    BeatTimeColor = -1,
+    HeavenPunisherColor = -16711936,
+    NoHeavenPunisherColor = -65536,
+    WarningColor = -992249,
   }
 end
 
@@ -64,15 +73,33 @@ local function SaveOptions(options)
     io.write(string.format("  Width = %s,\n", tostring(options.Width)))
     io.write(string.format("  Height = %s,\n", tostring(options.Height)))
     io.write(string.format("  Changed = %s,\n", tostring(options.Changed)))
-    io.write(string.format("  NoHighContrast = %s,\n", tostring(options.NoHighContrast)))
+    io.write(string.format("  ColorEnabled = %s,\n", tostring(options.ColorEnabled)))
+    io.write(string.format("  BeatTimeColor = %s,\n", tostring(options.BeatTimeColor)))
+    io.write(string.format("  HeavenPunisherColor = %s,\n", tostring(options.HeavenPunisherColor)))
+    io.write(string.format("  NoHeavenPunisherColor = %s,\n", tostring(options.NoHeavenPunisherColor)))
+    io.write(string.format("  WarningColor = %s,\n", tostring(options.WarningColor)))
     io.write("}\n")
 
     io.close(file)
   end
 end
 
+-- Custom colored text with hex shifted to ARGB
+local function TextCustomColored(color, text)
+  if not color then return imgui.Text(text) end
+  color =  
+  {
+    bit.band(bit.rshift(color, 16), 0xFF)/255,
+    bit.band(bit.rshift(color, 8), 0xFF)/255,
+    bit.band(color, 0xFF)/255,
+    bit.band(bit.rshift(color, 24), 0xFF)/255
+  }
+  return imgui.TextColored(color[1], color[2], color[3], color[4], text)
+end
+
+
 -- Function to get the current Swatch Internet Time
-function getSwatchInternetTime()
+local function getSwatchInternetTime()
   -- Get the current time in UTC
   local utcTime = os.time(os.date("*t"))
   
@@ -92,14 +119,15 @@ end
 -- Function to determine if we have Divine Punishment or not
 local function doWeHaveDivinePunishment()
   local currentBeats = getSwatchInternetTime()
-  if currentBeats < 100 or math.fmod(currentBeats, 200) == 0 then
+  local hundredsDigit = math.floor(currentBeats / 100)
+  if currentBeats < 100 or math.fmod(hundredsDigit, 2) == 0 then
     return true
   end
   return false
 end
 
 -- Function to calculate the time until the next hundredth beat time
-function getTimeUntilNextHundredthBeat()
+local function getTimeUntilNextHundredthBeat()
   local currentBeats = getSwatchInternetTime()
   local nextHundredthBeat = math.ceil(currentBeats / 100) * 100
   local beatsUntilNextHundredth = nextHundredthBeat - currentBeats
@@ -107,46 +135,70 @@ function getTimeUntilNextHundredthBeat()
   -- Convert beats to seconds (1 beat = 86.4 seconds)
   local secondsUntilNextHundredth = beatsUntilNextHundredth * 86.4
   
+  local time = { 
+    hours = nil,
+    minutes = nil,
+    seconds = nil
+  }
+
   -- Calculate hours, minutes, and seconds
-  local hours = math.floor(secondsUntilNextHundredth / 3600)
-  local minutes = math.floor((secondsUntilNextHundredth % 3600) / 60)
-  local seconds = math.floor(secondsUntilNextHundredth % 60)
-  
-  if hours == 0 then
-    return string.format("%02d:%02d", minutes, seconds)
+  time.hours = math.floor(secondsUntilNextHundredth / 3600)
+  time.minutes = math.floor((secondsUntilNextHundredth % 3600) / 60)
+  time.seconds = math.floor(secondsUntilNextHundredth % 60)
+
+  return time
+end
+
+local function getFormattedTimeForTimer(time)
+  if time.hours == 0 then
+    return string.format("%02d:%02d", time.minutes, time.seconds)
   end
 
   -- Return the formatted string
-  return string.format("%1d:%02d:%02d", hours, minutes, seconds)
+  return string.format("%1d:%02d:%02d", time.hours, time.minutes, time.seconds)
 end
 
 local function getFormattedBeatTime()
-  return string.format("@%.2f", getSwatchInternetTime())
+  beats = getSwatchInternetTime()
+  if beats < 100 then
+    return string.format("@ 0%.2f", beats)
+  end
+  return string.format("@ %.2f", getSwatchInternetTime())
+end
+
+local function getTimerColor(time)
+  if time.hours == 0 and time.minutes < 10 then
+    return options.WarningColor
+  end
+  if doWeHaveDivinePunishment() then
+    return options.HeavenPunisherColor
+  end
+
+  return options.NoHeavenPunisherColor
 end
 
 -- Shows the timer
 local function showTimer()
-    local timeTilNextEvent = getTimeUntilNextHundredthBeat()
+    local timeTable = getTimeUntilNextHundredthBeat()
+    local formattedTimer = getFormattedTimeForTimer(timeTable)
     local currentBeats = getFormattedBeatTime()
+    local timerColor = getTimerColor(timeTable)
 
-    if doWeHaveDivinePunishment() then
-      if options.NoHighContrast then
-        imgui.Text(currentBeats)
-        imgui.Text(timeTilNextEvent)
-      else
-        imgui.Text(currentBeats)
-        imgui.TextColored(0, 1, 0, 1, timeTilNextEvent)
-      end
+    -- Display the time until the next .beat event
+    if options.ColorEnabled then
+      TextCustomColored(timerColor, formattedTimer)
     else
-      if options.NoHighContrast then
-        imgui.Text(currentBeats)
-        imgui.Text(timeTilNextEvent)
+      imgui.Text(formattedTimer)
+    end
+
+    -- Display the beat time if it's enabled
+    if options.ShowBeatClock then
+      if options.ColorEnabled then
+        TextCustomColored(options.BeatTimeColor, currentBeats)
       else
         imgui.Text(currentBeats)
-        imgui.TextColored(1, 0, 0, 1, timeTilNextEvent)
       end
     end
-    
 end
 
 -- config setup and drawing
@@ -220,7 +272,7 @@ local function init()
   
   return {
     name = "Beat Timer",
-    version = "1.0.1",
+    version = "1.0.2",
     author = "Nate Nasteff",
     description = "Displays a timer for the next .beat event",
     present = present
