@@ -49,3 +49,4 @@ v1.0.2
 - Allowed for custom colors for .beat clock, timer and 10 minute warning
 - Added ability to hide the .beat clock
 - Swapped the .beat clock and timer locations in the display
+- Traded out text input for click-drag sliders in font scaling + size/position values

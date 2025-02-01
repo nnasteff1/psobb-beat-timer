@@ -35,13 +35,13 @@ local function ConfigurationWindow(configuration, customTheme)
 
     imgui.PushItemWidth(75)
     for n = 1, 4, 1 do
-        local changedDragInt = false
+        local success = false
         if n ~= 1 then
             imgui.SameLine(0, 5)
         end
 
-        changedDragInt, i_custom[n] = imgui.DragInt(ids[n], i_custom[n], 1.0, 0, 255, fmt[n])
-        if changedDragInt then
+        success, i_custom[n] = imgui.DragInt(ids[n], i_custom[n], 1.0, 0, 255, fmt[n])
+        if success then
             this.changed = true
         end
     end
@@ -129,47 +129,74 @@ end
         _configuration.Transparent = not _configuration.Transparent
         this.changed = true
       end
-      
-      success, _configuration.fontScale = imgui.InputFloat("Font Scale", _configuration.fontScale)
+      imgui.PushItemWidth(400)
+      success, _configuration.fontScale = imgui.DragFloat("Font Scale", _configuration.fontScale, 0.01, 0.5, 2.0, "%.6f")
+      imgui.PopItemWidth()
       if success then
         this.changed = true
       end
-      
       
       imgui.Text("\nPosition and Size")
-      imgui.PushItemWidth(150)
-      success, _configuration.X = imgui.InputInt("X", _configuration.X)
-      imgui.PopItemWidth()
+      imgui.PushItemWidth(170)
+      success, _configuration.X = imgui.DragInt("X", _configuration.X, 1.0, 0, 0, "X: %4.0f")
       if success then
         _configuration.Changed = true
         this.changed = true
       end
+
+      imgui.SameLine(0, 20)
+      success, _configuration.Y = imgui.DragInt("Y", _configuration.Y, 1.0, 0, 0, "Y: %4.0f")
+      if success then
+        _configuration.Changed = true
+        this.changed = true
+      end
+
+      success, _configuration.Width = imgui.DragInt("W", _configuration.Width, 1.0, -1, 1920, "Width: %4.0f")
+      if success then
+        _configuration.Changed = true
+        this.changed = true
+      end
+
+      imgui.SameLine(0, 20)
+      success, _configuration.Height = imgui.DragInt("H", _configuration.Height, 1.0, 0, 1080, "Height: %4.0f")
+      if success then
+        _configuration.Changed = true
+        this.changed = true
+      end
+      imgui.PopItemWidth()
+      -- imgui.PushItemWidth(150)
+      -- success, _configuration.X = imgui.InputInt("X", _configuration.X)
+      -- imgui.PopItemWidth()
+      -- if success then
+      --   _configuration.Changed = true
+      --   this.changed = true
+      -- end
       
-      imgui.SameLine(0, 38)
-      imgui.PushItemWidth(150)
-      success, _configuration.Y = imgui.InputInt("Y", _configuration.Y)
-      imgui.PopItemWidth()
-      if success then
-        _configuration.Changed = true
-        this.changed = true
-      end
+      -- imgui.SameLine(0, 38)
+      -- imgui.PushItemWidth(150)
+      -- success, _configuration.Y = imgui.InputInt("Y", _configuration.Y)
+      -- imgui.PopItemWidth()
+      -- if success then
+      --   _configuration.Changed = true
+      --   this.changed = true
+      -- end
       
-      imgui.PushItemWidth(150)
-      success, _configuration.Width = imgui.InputInt("Width", _configuration.Width)
-      imgui.PopItemWidth()
-      if success then
-        _configuration.Changed = true
-        this.changed = true
-      end
+      -- imgui.PushItemWidth(150)
+      -- success, _configuration.Width = imgui.InputInt("Width", _configuration.Width)
+      -- imgui.PopItemWidth()
+      -- if success then
+      --   _configuration.Changed = true
+      --   this.changed = true
+      -- end
       
-      imgui.SameLine(0, 10)
-      imgui.PushItemWidth(150)
-      success, _configuration.Height = imgui.InputInt("Height", _configuration.Height)
-      imgui.PopItemWidth()
-      if success then
-        _configuration.Changed = true
-        this.changed = true
-      end
+      -- imgui.SameLine(0, 10)
+      -- imgui.PushItemWidth(150)
+      -- success, _configuration.Height = imgui.InputInt("Height", _configuration.Height)
+      -- imgui.PopItemWidth()
+      -- if success then
+      --   _configuration.Changed = true
+      --   this.changed = true
+      -- end
 
       imgui.TreePop()
     end
