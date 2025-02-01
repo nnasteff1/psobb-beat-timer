@@ -9,6 +9,20 @@ local optionsFileName = "addons/Beat Timer/options.lua"
 local firstPresent = true
 local ConfigurationWindow
 
+local function shiftHexColor(color)
+  return
+  {
+    bit.band(bit.rshift(color, 16), 0xFF)/255,
+    bit.band(bit.rshift(color, 8), 0xFF)/255,
+    bit.band(color, 0xFF)/255,
+    bit.band(bit.rshift(color, 24), 0xFF)/255
+  }
+end
+
+local function TextCustomColored(color, text)
+  if not color then return imgui.Text(text) end
+  return imgui.TextColored(color[1], color[2], color[3], color[4], text)
+end
 
 if optionsLoaded then
   options.configurationEnableWindow = options.configurationEnableWindow == nil and true or options.configurationEnableWindow
@@ -25,6 +39,9 @@ if optionsLoaded then
   options.Height = options.Height or 80
   options.Changed = options.Changed or false
   options.NoHighContrast = options.HighContrast == nil and false or options.HighContrast
+  options.BeatTimeColor = options.BeatTimeColor or -12753
+  options.HeavenPunisherColor = options.HeavenPunisherColor or -12321024
+  options.NoHeavenPunisherColor = options.HeavenPunisherColor or -1232344
 else
   options = {
     configurationEnableWindow = true,
@@ -41,6 +58,9 @@ else
     Height = 92,
     Changed = false,
     NoHighContrast = false,
+    BeatTimeColor = -12753,
+    HeavenPunisherColor = -12321024,
+    NoHeavenPunisherColor = -1232344
   }
 end
 
@@ -65,6 +85,9 @@ local function SaveOptions(options)
     io.write(string.format("  Height = %s,\n", tostring(options.Height)))
     io.write(string.format("  Changed = %s,\n", tostring(options.Changed)))
     io.write(string.format("  NoHighContrast = %s,\n", tostring(options.NoHighContrast)))
+    io.write(string.format("  BeatTimeColor = %s,\n", tostring(options.BeatTimeColor)))
+    io.write(string.format("  HeavenPunisherColor = %s,\n", tostring(options.HeavenPunisherColor)))
+    io.write(string.format("  NoHeavenPunisherColor = %s,\n", tostring(options.NoHeavenPunisherColor)))
     io.write("}\n")
 
     io.close(file)
@@ -128,23 +151,28 @@ end
 local function showTimer()
     local timeTilNextEvent = getTimeUntilNextHundredthBeat()
     local currentBeats = getFormattedBeatTime()
+    local customColor = shiftHexColor(options.BeatTimeColor)
+    local customColor2 = shiftHexColor(options.HeavenPunisherColor)
+    local customColor3 = shiftHexColor(options.NoHeavenPunisherColor)
+
+    if options.NoHighContrast then
+      imgui.Text(currentBeats)
+    else
+      TextCustomColored(shiftHexColor(options.BeatTimeColor), currentBeats)
+    end
 
     if doWeHaveDivinePunishment() then
       if options.NoHighContrast then
-        imgui.Text(currentBeats)
         imgui.Text(timeTilNextEvent)
-      else
-        imgui.Text(currentBeats)
-        imgui.TextColored(0, 1, 0, 1, timeTilNextEvent)
+        return
       end
+      TextCustomColored(shiftHexColor(options.HeavenPunisherColor), timeTilNextEvent)
     else
       if options.NoHighContrast then
-        imgui.Text(currentBeats)
         imgui.Text(timeTilNextEvent)
-      else
-        imgui.Text(currentBeats)
-        imgui.TextColored(1, 0, 0, 1, timeTilNextEvent)
+        return
       end
+      TextCustomColored(shiftHexColor(options.HeavenPunisherColor), timeTilNextEvent)
     end
     
 end
