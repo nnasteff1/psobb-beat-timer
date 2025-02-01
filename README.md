@@ -39,6 +39,8 @@ v1.0.1
 - Updated timer to truncate if no hours remain in the timer (1:00:00 -> 59:59)
 
 v1.0.2
-- Allowed for custom colors for .beat clock and timer
+- Added 10-minute warning colorization to timer
+- Expanded menu + option to disable all colors
+- Allowed for custom colors for .beat clock, timer and 10 minute warning
 - Added ability to hide the .beat clock
 - Swapped the .beat clock and timer locations in the display
